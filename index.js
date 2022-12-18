@@ -1,24 +1,21 @@
+const mainRouter = require("./src/routes/index");
 const express = require("express");
 const cors = require(`cors`);
 const morgan = require(`morgan`);
-const { createServer } = require("http");
-const { Server } = require("socket.io");
 const bodyParser = require(`body-parser`);
 require(`dotenv`).config();
 const upload = require("./src/middlewares/upload");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
 
-const mainRouter = require("./src/routes/index");
 const app = express();
-const httpServer = createServer(app);
-// const io = new Server(httpServer, {
-//   cors: {
-//     origin: "http://localhost:4000",
-//   },
-// });
-
+const httpServer = createServer();
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:3000",
+  },
+});
 const PORT = process.env.PORT;
-
-const Port = 3500;
 
 io.on("connection", (socket) => {
   console.log(`user connect ${socket.id}`);
@@ -53,10 +50,10 @@ app.use("/", (req, res, next) => {
   res.status(200).json({ status: "success", statusCode: 200 });
 });
 
-app.listen(PORT, () => {
-  console.log(` Example app listening on port ${PORT}`);
+httpServer.listen(PORT, () => {
+  console.log(` App running socket on port ${PORT} :)`);
 });
 
-httpServer.listen(Port, () => {
-  console.log(`app running on ${Port}`);
-});
+// app.listen(PORT, () => {
+//   console.log(` Example app listening on port ${PORT} :)`);
+// });
