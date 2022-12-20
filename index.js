@@ -7,6 +7,7 @@ require(`dotenv`).config();
 const upload = require("./src/middlewares/upload");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
+var moment = require("moment");
 
 const app = express();
 const httpServer = createServer();
@@ -15,15 +16,22 @@ const io = new Server(httpServer, {
     origin: "http://localhost:3000",
   },
 });
-const PORT = process.env.PORT;
+const port = process.env.PORT;
 
 io.on("connection", (socket) => {
   console.log(`user connect ${socket.id}`);
 
+  socket.on("initialRoom", ({ room }) => {
+    console.log(room);
+    socket.join(`room:${room}`);
+  });
+
   socket.on("message", (data) => {
-    let time = new Date();
-    io.emit("messageBe", { message: data, date: time });
-    socket.broadcast.emit("messageBe", { message: data, date: time });
+    io.to(`room:${data.group}`).emit("messageBe", {
+      sender: data.name,
+      message: data.message,
+      date: moment().format("HH:mm"),
+    });
     console.log(data);
   });
 
@@ -50,10 +58,17 @@ app.use("/", (req, res, next) => {
   res.status(200).json({ status: "success", statusCode: 200 });
 });
 
-httpServer.listen(PORT, () => {
-  console.log(` App running socket on port ${PORT} :)`);
+httpServer.listen(port, () => {
+  console.log(` App running socket on port ${port} `);
 });
 
 // app.listen(PORT, () => {
-//   console.log(` Example app listening on port ${PORT} :)`);
+//     console.log(` Example app listening on port ${PORT} :)`);
+//   });
+
+// socket.on("message", (data) => {
+//   let time = new Date();
+//   io.emit("messageBe", { message: data, date: time });
+//   socket.broadcast.emit("messageBe", { message: data, date: time });
+//   console.log(data);
 // });
