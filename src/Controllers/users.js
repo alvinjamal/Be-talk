@@ -180,9 +180,9 @@ const UsersController = {
     const id_user = req.payload.id_user;
     ModelUsers.getDataById(id_user)
       .then((result) =>
-        response(res, 200, true, result.rows, "Get Detail User Success")
+        response(res, 200, true, result.rows, "Get Detail Success")
       )
-      .catch((err) => response(res, 404, false, err, "Get Detail User Fail"));
+      .catch((err) => response(res, 404, false, err, "Get Detail Fail"));
   },
 
   update: async (req, res) => {
