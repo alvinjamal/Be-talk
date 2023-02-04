@@ -81,7 +81,7 @@ OAUTH_REFRESH_TOKEN=
 {
 "name_user": "Alvin Jamal Azkya"
 "email": "alvinjamalazkya@gmail.com",
-"passwordr": "alvin123",
+"password": "alvin123",
 }
 
 ````
@@ -143,8 +143,8 @@ OAUTH_REFRESH_TOKEN=
         {
             "id_user": "9d643d80-befa-4ed4-a483-f035e3327e0c",
             "email": "alvinjamalazkya@gmail.com",
-            "password": "$2a$10$eCVQWa/JXB8gmAJUSxsC7u43PrHZcS3mL3nNlT37m3fPpB8LVSOR.",
             "name_user": "Azkya",
+            "password": "$2a$10$eCVQWa/JXB8gmAJUSxsC7u43PrHZcS3mL3nNlT37m3fPpB8LVSOR.",
             "photo": "http://res.cloudinary.com/diunwoak6/image/upload/v1675482787/chat/ehqiogdnxyhkovhtbwdz.jpg",
             "verif": 1,
             "phone": "08524411"
@@ -172,7 +172,7 @@ OAUTH_REFRESH_TOKEN=
     "data": {
         "username": "VinAzkya",
         "bio": "Programmer Sejati",
-        "phone_number": "08524411",
+        "phone": "08524411",
         "photo": "http://res.cloudinary.com/diunwoak6/image/upload/v1675482787/chat/ehqiogdnxyhkovhtbwdz.jpg"
     },
     "message": "Update Profile Success"
