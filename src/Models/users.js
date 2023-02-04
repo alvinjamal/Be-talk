@@ -1,11 +1,11 @@
 const Pool = require("./../config/db");
 
 const create = (data) => {
-  const { id_user, fullname_user, email, password, otp } = data;
+  const { id_user, name_user, email, password, otp } = data;
   console.log(data);
   return new Promise((resolve, reject) =>
     Pool.query(
-      `INSERT INTO users(id_user,fullname_user,email,password,verif,otp) VALUES('${id_user}','${fullname_user}','${email}','${password}',0,${otp})`,
+      `INSERT INTO users(id_user,name_user,email,password,verif,otp) VALUES('${id_user}','${name_user}','${email}','${password}',0,${otp})`,
       (err, result) => {
         if (!err) {
           resolve(result);
@@ -59,9 +59,28 @@ const changePassword = (email, password) => {
   );
 };
 
+const updateProfile = (data) => {
+  const { id_user, username, bio, phone, photo } = data;
+  return Pool.query(
+    `UPDATE users SET username='${username}',bio='${bio}',phone=${phone},photo='${photo}' WHERE id_user='${id_user}'`
+  );
+};
+
+const getDataById = (id_user) => {
+  console.log(id_user);
+  return Pool.query(`SELECT * FROM users WHERE id_user = '${id_user}'`);
+};
+
+const getAll = () => {
+  return Pool.query(`SELECT * FROM users`);
+};
+
 module.exports = {
   create,
   findEmail,
   verification,
   changePassword,
+  updateProfile,
+  getDataById,
+  getAll,
 };

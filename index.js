@@ -1,74 +1,48 @@
-const mainRouter = require("./src/routes/index");
 const express = require("express");
-const cors = require(`cors`);
-const morgan = require(`morgan`);
-const bodyParser = require(`body-parser`);
-require(`dotenv`).config();
+const bodyParser = require("body-parser");
+const cors = require("cors");
+require("dotenv").config();
+const socketController = require("./src/socket/index");
+const helmet = require("helmet");
+const http = require("http");
+const socket = require("socket.io");
+const mainRouter = require("./src/routes/index");
 const upload = require("./src/middlewares/upload");
-const { createServer } = require("http");
-const { Server } = require("socket.io");
-var moment = require("moment");
-
+// const io = require("socket.io")(server, { origins: "*:*" });
+const { resp } = require("./src/middlewares/common");
 const app = express();
-const httpServer = createServer();
-const io = new Server(httpServer, {
-  cors: {
-    origin: "http://localhost:3000",
-  },
-});
-const port = process.env.PORT;
 
-io.on("connection", (socket) => {
-  console.log(`user connect ${socket.id}`);
-
-  socket.on("initialRoom", ({ room }) => {
-    console.log(room);
-    socket.join(`room:${room}`);
-  });
-
-  socket.on("message", (data) => {
-    io.to(`room:${data.group}`).emit("messageBe", {
-      sender: data.name,
-      message: data.message,
-      date: moment().format("HH:mm"),
-    });
-    console.log(data);
-  });
-
-  socket.on("disconnect", () => {
-    console.log(`user disconnect ${socket.id}`);
-  });
-});
-
-app.use(cors("*"));
-app.use(morgan("dev"));
+app.use(express.static("public"));
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use("/", mainRouter);
 
+app.use(
+  helmet({
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: false,
+  })
+);
+
+app.use(bodyParser.json());
 app.use("/img", express.static("./upload"));
 app.use(upload.array());
 
-app.all("*", (req, res, next) => {
-  res.status(404).json({ status: "error", statusCode: 404 });
+const server = http.createServer(app);
+const io = socket(server, {
+  cors: {
+    origins: "*",
+  },
 });
 
-app.use("/", (req, res, next) => {
-  res.status(200).json({ status: "success", statusCode: 200 });
+io.on("connection", (socket) => {
+  console.log("new user connect");
+  socketController(io, socket);
 });
 
-httpServer.listen(port, () => {
-  console.log(` App running socket on port ${port} `);
+const PORT = process.env.PORT || 4000;
+
+server.listen(PORT, () => {
+  console.log(`app running on ${PORT}`);
 });
-
-// app.listen(PORT, () => {
-//     console.log(` Example app listening on port ${PORT} :)`);
-//   });
-
-// socket.on("message", (data) => {
-//   let time = new Date();
-//   io.emit("messageBe", { message: data, date: time });
-//   socket.broadcast.emit("messageBe", { message: data, date: time });
-//   console.log(data);
-// });

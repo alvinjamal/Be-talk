@@ -8,6 +8,8 @@ const {
 const bcrypt = require("bcryptjs");
 const { v4: uuidv4 } = require("uuid");
 const { generateToken, decodeToken } = require("../Helpers/auth");
+const cloudinary = require("../config/photo");
+const ModelUsers = require("../Models/users");
 const email = require("../middlewares/email");
 
 const Port = process.env.PORT;
@@ -33,7 +35,7 @@ const UsersController = {
     let password = bcrypt.hashSync(req.body.password);
     let data = {
       id_user: uuidv4(),
-      fullname_user: req.body.fullname_user,
+      name_user: req.body.name_user,
       email: req.body.email,
       password,
       otp,
@@ -42,7 +44,7 @@ const UsersController = {
       const result = await create(data);
       if (result) {
         let verifUrl = `http://${Host}:${Port}/users/${req.body.email}/${otp}`;
-        let text = `Hello ${req.body.fullname_user} \n Thank you for join us. Please confirm your email by clicking on the following link ${verifUrl}`;
+        let text = `Hello ${req.body.name_user} \n Thank you for join us. Please confirm your email by clicking on the following link ${verifUrl}`;
         const subject = `${otp} is your otp`;
         let sendEmail = email(req.body.email, subject, text);
         if (sendEmail == "email not sent!") {
@@ -99,6 +101,7 @@ const UsersController = {
     delete users.otp;
     delete users.verif;
     let payload = {
+      id_user: users.id_user,
       email: users.email,
     };
     users.token = generateToken(payload);
@@ -139,7 +142,7 @@ const UsersController = {
     };
     const token = generateToken(payload);
 
-    let text = `Hello ${users.fullname_user} \n please click link below to reset password http://localhost:4000/users/Reset-Pass/ ${token}`;
+    let text = `Hello ${users.name_user} \n please click link below to reset password http://localhost:4000/users/Reset-Pass/ ${token}`;
     const subject = `Reset Password`;
     let sendEmail = email(req.body.email, subject, text);
     if (sendEmail == "email not sent!") {
@@ -161,6 +164,47 @@ const UsersController = {
     let password = bcrypt.hashSync(req.body.password);
     const result = await changePassword(decoded.email, password);
     return response(res, 200, true, result, " change password success");
+  },
+
+  getUser: async (req, res) => {
+    ModelUsers.getAll()
+      .then((result) => {
+        response(res, 200, true, result.rows, "Get User Success");
+      })
+      .catch((err) => {
+        response(res, 404, false, err, "Get User Fail");
+      });
+  },
+
+  getDetail: async (req, res) => {
+    const id_user = req.payload.id_user;
+    ModelUsers.getDataById(id_user)
+      .then((result) =>
+        response(res, 200, true, result.rows, "Get Detail User Success")
+      )
+      .catch((err) => response(res, 404, false, err, "Get Detail User Fail"));
+  },
+
+  update: async (req, res) => {
+    try {
+      const id_user = req.payload.id_user;
+      const image = await cloudinary.uploader.upload(req.file.path, {
+        folder: "chat",
+      });
+      req.body.photo = image.url;
+      const data = {
+        id_user,
+        username: req.body.username,
+        bio: req.body.bio,
+        phone: req.body.phone,
+        photo: image.url,
+      };
+      await ModelUsers.updateProfile(data);
+      return response(res, 200, true, req.body, "Update Profile Success");
+    } catch (err) {
+      console.log(err);
+      return response(res, 404, false, err, "Update Profile Fail");
+    }
   },
 };
 
