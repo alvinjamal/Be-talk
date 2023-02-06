@@ -62,70 +62,69 @@ OAUTH_REFRESH_TOKEN=
 `
 
 ### Body
-
+```
 {
 "email": "alvinjamalazkya@gmail.com",
 "password": "alvin123"
 }
-``
+```
 
 #### Register
-
-`http
+```
+http
   POST /users/register
-`
+```
 
 ### Body
 
-``body
+```body
 {
 "name_user": "Alvin Jamal Azkya"
 "email": "alvinjamalazkya@gmail.com",
 "password": "alvin123",
 }
-
-````
+```
 
 ### Verification
 
-``http
+```http
   POST /users/verif
-``
+```
 
 ### Body
 
-``body
+```body
 {
     "email":"alvinjamalazkya@gmail.com",
     "otp":"096624"
 }
-``
+```
 ### Forgot
 
-``http
+```http
   POST /users/forgot
-``
+```
 
 ### Body
 
-``body
+```body
 {
     "email":"alvinjamalazkya@gmail.com",
 }
 ### Forgot
 
-``http
+```http
   POST /users/forgot/:token
-``
+```
 
 ### Body
 
-``body
+```body
 {
     "email":"alvinjamalazkya@gmail.com",
     "Password":"jamal123"
 }
-``
+```
 
 #### Profile
 
